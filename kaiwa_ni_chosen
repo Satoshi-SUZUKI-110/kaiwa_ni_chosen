@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f4f1ea">
+  <title>誘いを断る練習</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f1ea;          /* 生成り色 */
+      --card: #fffdf8;
+      --ink: #3b403c;
+      --muted: #7d837d;
+      --line: #e4dfd3;
+      --accent: #6b8f7b;      /* セージグリーン */
+      --accent-dark: #557463;
+      --accent-soft: #e8efe9;
+      --warm-soft: #f6ede0;
+      --stop: #c4806f;        /* くすんだテラコッタ */
+      --ring: rgba(107, 143, 123, .22);
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; padding: 24px 16px 40px;
+      background: var(--bg); color: var(--ink);
+      font-family: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', 'Hiragino Sans', sans-serif;
+      line-height: 1.6;
+    }
+    .hidden { display: none !important; }
+    rt { font-size: .55em; font-weight: 400; color: var(--muted); letter-spacing: 0; }
+    button rt { color: inherit; opacity: .85; }
+    .card {
+      max-width: 460px; margin: 0 auto; background: var(--card);
+      border: 1px solid var(--line); border-radius: 24px;
+      padding: 28px 22px; box-shadow: 0 6px 24px rgba(80, 70, 50, .06);
+    }
+
+    /* ---- ヘッダー ---- */
+    .hero { text-align: center; margin-bottom: 22px; }
+    .logo {
+      width: 64px; height: 64px; margin: 0 auto 10px; border-radius: 20px;
+      background: var(--accent-soft); display: grid; place-items: center;
+    }
+    .hero h1 { font-size: 1.5rem; font-weight: 700; margin: 0; letter-spacing: .08em; }
+    .hero p { margin: 4px 0 0; color: var(--muted); font-size: .9rem; }
+
+    /* ---- フォーム ---- */
+    .group { margin-top: 18px; }
+    .group-title {
+      display: flex; align-items: center; gap: 8px;
+      font-size: .8rem; color: var(--accent-dark); font-weight: 700; letter-spacing: .1em;
+      margin-bottom: 4px;
+    }
+    .group-title::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+    label { display: block; margin-top: 14px; font-size: .92rem; font-weight: 500; }
+    input, select {
+      width: 100%; margin-top: 6px; padding: 13px 14px;
+      font: inherit; font-size: 1rem; color: var(--ink);
+      background: #fff; border: 1.5px solid var(--line); border-radius: 14px;
+      outline: none; transition: border-color .2s, box-shadow .2s;
+      -webkit-appearance: none; appearance: none;
+    }
+    input::placeholder { color: #b7b9b2; }
+    input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--ring); }
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: ''; position: absolute; right: 16px; top: 50%; margin-top: -1px;
+      width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted);
+      transform: translateY(-50%) rotate(45deg); pointer-events: none;
+    }
+    .select-wrap select { padding-right: 40px; }
+    .pw-wrap { position: relative; }
+    .pw-wrap input { padding-right: 52px; }
+    .pw-toggle {
+      position: absolute; right: 6px; top: 50%; transform: translateY(-50%); margin-top: 3px;
+      width: 40px; height: 40px; border: none; background: none; padding: 0; color: var(--muted); cursor: pointer;
+      display: grid; place-items: center; border-radius: 10px;
+    }
+    .field-error { color: var(--stop); font-size: .82rem; margin-top: 6px; }
+
+    .notes {
+      margin-top: 22px; padding: 14px 16px; border-radius: 16px;
+      background: var(--warm-soft); font-size: .85rem; line-height: 1.75;
+    }
+    .notes ul { margin: 0; padding-left: 1.1em; }
+
+    /* ---- ボタン ---- */
+    button {
+      width: 100%; margin-top: 14px; padding: 15px; border: none; border-radius: 999px;
+      font: inherit; font-size: 1.05rem; font-weight: 700; letter-spacing: .05em; cursor: pointer;
+      transition: transform .1s, background .2s, opacity .2s;
+    }
+    button:disabled { opacity: .5; cursor: default; }
+    button:active:not(:disabled) { transform: scale(.98); }
+    .btn-main { background: var(--accent); color: #fff; box-shadow: 0 4px 12px rgba(85, 116, 99, .25); }
+    .btn-main:hover:not(:disabled) { background: var(--accent-dark); }
+    .btn-stop { background: var(--stop); color: #fff; }
+    .btn-sub { background: var(--accent-soft); color: var(--accent-dark); }
+    #btn-start { margin-top: 24px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+    /* ---- 会話画面 ---- */
+    .mission {
+      border: 2px solid var(--accent); background: var(--accent-soft);
+      border-radius: 18px; padding: 12px 16px 10px; text-align: center;
+    }
+    .mission-tag {
+      display: inline-block; font-size: .75rem; font-weight: 700; letter-spacing: .15em;
+      color: #fff; background: var(--accent); border-radius: 999px; padding: 1px 12px;
+    }
+    .mission-text { margin: 6px 0 2px; font-size: 1.15rem; font-weight: 700; color: var(--accent-dark); line-height: 2; }
+    .mission-sub { margin: 0; font-size: .8rem; color: var(--muted); line-height: 1.9; }
+    .illust { border-radius: 18px; overflow: hidden; margin: 12px 0; }
+    .illust svg { display: block; width: 100%; height: auto; }
+    .progress { display: flex; justify-content: center; gap: 8px; margin: 6px 0 10px; }
+    .progress span { width: 11px; height: 11px; border-radius: 50%; background: var(--line); transition: background .3s; }
+    .progress span.done { background: var(--accent); }
+    .status { text-align: center; min-height: 3.2em; font-size: 1rem; margin: 6px 0; }
+    .rec { display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--stop); font-weight: 700; }
+    .rec .dot { width: 11px; height: 11px; border-radius: 50%; background: var(--stop); animation: blink 1s infinite; }
+    @keyframes blink { 50% { opacity: .2; } }
+    .loader {
+      width: 34px; height: 34px; margin: 10px auto; border-radius: 50%;
+      border: 4px solid var(--accent-soft); border-top-color: var(--accent); animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .center { text-align: center; }
+    .dl-title { font-size: .9rem; color: var(--muted); margin: 18px 0 0; }
+    .btn-dl {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      background: var(--accent); color: #fff; box-shadow: 0 4px 12px rgba(85, 116, 99, .25);
+    }
+    .btn-dl:hover:not(:disabled) { background: var(--accent-dark); }
+    .btn-dl + .btn-dl { margin-top: 10px; }
+    .dl-sub { font-size: .78rem; font-weight: 500; opacity: .85; letter-spacing: 0; }
+    .btn-link {
+      background: none; color: var(--accent-dark); font-size: .85rem; font-weight: 500;
+      text-decoration: underline; padding: 8px; margin-top: 8px; letter-spacing: 0;
+    }
+    .center h1 { font-size: 1.35rem; margin: 6px 0 8px; }
+    .hint { font-size: .82rem; color: var(--muted); }
+    .done-icon {
+      width: 72px; height: 72px; margin: 0 auto 6px; border-radius: 50%;
+      background: var(--accent-soft); display: grid; place-items: center;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== 1. 設定画面 ===== -->
+<section class="card screen" id="screen-setup">
+  <div class="hero">
+    <div class="logo" aria-hidden="true">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#557463" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 5h11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H9l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/>
+        <path d="M19 9h1a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v2.5L16 18h-3"/>
+      </svg>
+    </div>
+    <h1><ruby>誘<rt>さそ</rt></ruby>いを<ruby>断<rt>ことわ</rt></ruby>る</h1>
+    <p><ruby>先生<rt>せんせい</rt></ruby>の<ruby>誘<rt>さそ</rt></ruby>いを、<ruby>上手<rt>じょうず</rt></ruby>に<ruby>断<rt>ことわ</rt></ruby>ってみよう</p>
+  </div>
+
+  <div class="group">
+    <div class="group-title">あなたについて</div>
+
+    <label for="class-name">クラス</label>
+    <input type="text" id="class-name" placeholder="例：A1" autocomplete="off">
+
+    <label for="student-name"><ruby>名前<rt>なまえ</rt></ruby>（カタカナ）</label>
+    <input type="text" id="student-name" placeholder="例：スズキ　サトシ" autocomplete="off">
+
+    <label for="password">パスワード</label>
+    <div class="pw-wrap">
+      <input type="password" id="password" placeholder="先生に聞いてください" autocomplete="off">
+      <button type="button" class="pw-toggle" id="pw-toggle" aria-label="パスワードを表示">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+    <div class="field-error hidden" id="pw-error">パスワードがちがいます。<ruby>先生<rt>せんせい</rt></ruby>に<ruby>聞<rt>き</rt></ruby>いてください。</div>
+  </div>
+
+  <div class="group">
+    <div class="group-title"><ruby>練習<rt>れんしゅう</rt></ruby>の<ruby>設定<rt>せってい</rt></ruby></div>
+
+    <label for="level">いまの<ruby>日本語<rt>にほんご</rt></ruby>のレベル</label>
+    <div class="select-wrap">
+      <select id="level">
+        <option value="初級・初中級">初級・初中級（N5〜N4）</option>
+        <option value="中級" selected>中級（N3）</option>
+        <option value="中上級">中上級（N2）</option>
+        <option value="上級">上級（N1）</option>
+      </select>
+    </div>
+
+    <label for="invite"><ruby>誘<rt>さそ</rt></ruby>いの<ruby>内容<rt>ないよう</rt></ruby></label>
+    <div class="select-wrap">
+      <select id="invite">
+        <option value="random" selected>おまかせ</option>
+        <option value="karaoke">カラオケ</option>
+        <option value="meal">食事</option>
+        <option value="trip">旅行</option>
+        <option value="work">仕事の手伝い</option>
+        <option value="carry">荷物運び</option>
+      </select>
+    </div>
+
+    <label for="invites"><ruby>先生<rt>せんせい</rt></ruby>が<ruby>誘<rt>さそ</rt></ruby>う<ruby>回数<rt>かいすう</rt></ruby></label>
+    <div class="select-wrap">
+      <select id="invites">
+        <option value="random" selected>おまかせ（3〜4回）</option>
+        <option value="3">3回</option>
+        <option value="4">4回</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="notes">
+    <ul>
+      <li><ruby>静<rt>しず</rt></ruby>かな<ruby>場所<rt>ばしょ</rt></ruby>で<ruby>練習<rt>れんしゅう</rt></ruby>しましょう。イヤホンがあると、もっといいです。</li>
+      <li>iPhoneは、マナーモード（<ruby>消音<rt>しょうおん</rt></ruby>）をオフにしてください。</li>
+      <li>マイクの<ruby>許可<rt>きょか</rt></ruby>を<ruby>聞<rt>き</rt></ruby>かれたら、「<ruby>許可<rt>きょか</rt></ruby>」を<ruby>押<rt>お</rt></ruby>してください。</li>
+    </ul>
+  </div>
+
+  <button class="btn-main" id="btn-start">
+    <span><ruby>会話<rt>かいわ</rt></ruby>を<ruby>始<rt>はじ</rt></ruby>める</span>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+  </button>
+</section>
+
+<!-- ===== 2. 会話画面（先生の言葉の文字は出しません） ===== -->
+<section class="card screen hidden" id="screen-talk">
+  <div class="mission">
+    <span class="mission-tag">ミッション</span>
+    <p class="mission-text"><ruby>先生<rt>せんせい</rt></ruby>からの<ruby>誘<rt>さそ</rt></ruby>いを、<br><ruby>上手<rt>じょうず</rt></ruby>に<ruby>断<rt>ことわ</rt></ruby>ってください。</p>
+    <p class="mission-sub"><ruby>先生<rt>せんせい</rt></ruby>は<ruby>何回<rt>なんかい</rt></ruby>か<ruby>誘<rt>さそ</rt></ruby>います。<ruby>最後<rt>さいご</rt></ruby>まで、ていねいに<ruby>断<rt>ことわ</rt></ruby>りましょう。</p>
+  </div>
+  <div class="illust" id="illust"></div>
+  <div class="progress" id="progress"></div>
+  <p class="status" id="status"></p>
+  <div class="loader hidden" id="loader"></div>
+  <div class="rec hidden" id="rec"><span class="dot"></span><span id="rec-time">0:00</span></div>
+
+  <button class="btn-main hidden" id="btn-listen">▶ <ruby>聞<rt>き</rt></ruby>く</button>
+  <button class="btn-main hidden" id="btn-answer"><ruby>解答<rt>かいとう</rt></ruby>する</button>
+  <button class="btn-sub hidden" id="btn-repeat">すみません、もう<ruby>一度<rt>いちど</rt></ruby>お<ruby>願<rt>ねが</rt></ruby>いします</button>
+  <button class="btn-main hidden" id="btn-resend">もう<ruby>一度<rt>いちど</rt></ruby><ruby>送<rt>おく</rt></ruby>る</button>
+</section>
+
+<!-- ===== 3. 終了画面 ===== -->
+<section class="card screen hidden center" id="screen-finish">
+  <h1>お<ruby>疲<rt>つか</rt></ruby>れ<ruby>様<rt>さま</rt></ruby>でした。</h1>
+  <p><ruby>結果<rt>けっか</rt></ruby>が<ruby>届<rt>とど</rt></ruby>くまで、<ruby>少々<rt>しょうしょう</rt></ruby>お<ruby>待<rt>ま</rt></ruby>ちください。</p>
+  <div class="loader"></div>
+  <p class="hint">この<ruby>画面<rt>がめん</rt></ruby>を<ruby>閉<rt>と</rt></ruby>じないでください。（1〜2<ruby>分<rt>ふん</rt></ruby>）</p>
+</section>
+
+<section class="card screen hidden center" id="screen-done">
+  <div class="done-icon" aria-hidden="true">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#557463" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+  </div>
+  <h1 id="done-title"></h1>
+  <p id="done-msg"></p>
+  <div class="hidden" id="download-area">
+    <p class="dl-title">ダウンロードするものを<ruby>選<rt>えら</rt></ruby>んでください</p>
+    <button class="btn-dl" id="btn-dl-pdf">
+      <span class="dl-main"><ruby>結果<rt>けっか</rt></ruby>（<ruby>成績<rt>せいせき</rt></ruby>のみ）</span>
+      <span class="dl-sub">PDF</span>
+    </button>
+    <button class="btn-dl" id="btn-dl-both">
+      <span class="dl-main"><ruby>結果<rt>けっか</rt></ruby>（<ruby>成績<rt>せいせき</rt></ruby>＋<ruby>音声<rt>おんせい</rt></ruby>）</span>
+      <span class="dl-sub">PDF ＋ <ruby>自分<rt>じぶん</rt></ruby>の<ruby>声<rt>こえ</rt></ruby>（WAV）</span>
+    </button>
+    <button class="btn-link hidden" id="btn-audio-again"><ruby>音声<rt>おんせい</rt></ruby>がダウンロードされなかったときは、ここを<ruby>押<rt>お</rt></ruby>してください</button>
+    <p class="hint">iPhoneは「ファイル」アプリに<ruby>保存<rt>ほぞん</rt></ruby>されます。</p>
+  </div>
+  <button class="btn-main hidden" id="btn-retry-finish">もう<ruby>一度<rt>いちど</rt></ruby><ruby>送<rt>おく</rt></ruby>る</button>
+  <button class="btn-sub" id="btn-again">もう<ruby>一度<rt>いちど</rt></ruby><ruby>練習<rt>れんしゅう</rt></ruby>する</button>
+</section>
+
+<script>
+// ============ 設定 ============
+// ★ GASを「ウェブアプリ」でデプロイしたときのURL（…/exec で終わるもの）を、ここに貼ってください
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzGUmHdjNpLxT9iUfWQTt2rCvKzU8CbaMc9jMeA06dWIl_zGrk5MPNjnxyyWZFQaQpgwQ/exec';
+
+// 前後のスペースや改行が入っていても動くようにする
+const SERVER_URL = GAS_URL.trim();
+
+const MAX_REC_SEC = 60;   // 1回の録音の最大秒数
+const INVITE_IDS = ['karaoke', 'meal', 'trip', 'work', 'carry'];
+
+// ============ イラスト（シルエット：先生と学生） ============
+const ILLUST = `
+<svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="320" height="200" fill="#ebf0ea"/>
+  <rect y="160" width="320" height="40" fill="#dfe6dd"/>
+  <rect x="128" y="22" width="70" height="52" rx="4" fill="#c9b49b"/>
+  <rect x="136" y="30" width="22" height="16" fill="#fbfaf5" transform="rotate(-4 147 38)"/>
+  <rect x="164" y="32" width="26" height="18" fill="#f6ede0" transform="rotate(3 177 41)"/>
+  <rect x="142" y="52" width="20" height="14" fill="#e8efe9"/>
+  <circle cx="92" cy="70" r="23" fill="#4a5650"/>
+  <rect x="78" y="66" width="12" height="8" rx="3" fill="none" stroke="#d8d2c8" stroke-width="2"/>
+  <rect x="94" y="66" width="12" height="8" rx="3" fill="none" stroke="#d8d2c8" stroke-width="2"/>
+  <path d="M48 168 Q50 104 92 100 Q134 104 136 168 Z" fill="#4a5650"/>
+  <path d="M82 103 L92 132 L102 103 Z" fill="#fbfaf5"/>
+  <path d="M89 107 L92 130 L95 107 Z" fill="#a8695c"/>
+  <circle cx="236" cy="84" r="20" fill="#6b6560"/>
+  <path d="M200 168 Q202 116 236 112 Q270 116 272 168 Z" fill="#6b6560"/>
+  <path d="M214 120 L250 166" stroke="#a08670" stroke-width="5" stroke-linecap="round"/>
+  <path d="M262 62 q5 8 0 12 q-5 -4 0 -12 z" fill="#7d9aa8"/>
+  <circle cx="150" cy="96" r="3" fill="#7d837d"/><circle cx="160" cy="92" r="3" fill="#7d837d"/><circle cx="170" cy="96" r="3" fill="#7d837d"/>
+</svg>`;
+
+// ============ 状態 ============
+const state = { info: null, history: [], audios: [], answers: 0, badCount: 0, endReason: '', repeatUsed: false, finished: false, lastWav: null, result: null, downloaded: false };
+let audioCtx = null;   // 再生と録音の両方に使う
+let aiBuffer = null;   // いまの先生の音声
+let rec = null;        // 録音中のデータ
+let recTimer = null;
+
+const $ = id => document.getElementById(id);
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('hidden', s.id !== id));
+  window.scrollTo(0, 0);
+}
+function setStatus(t) { $('status').textContent = t; }
+function setLoading(b) { $('loader').classList.toggle('hidden', !b); }
+function setButtons(o) {
+  o = o || {};
+  $('btn-listen').classList.toggle('hidden', !o.listen);
+  $('btn-answer').classList.toggle('hidden', !o.answer);
+  $('btn-repeat').classList.toggle('hidden', !o.repeat);
+  $('btn-resend').classList.toggle('hidden', !o.resend);
+}
+function setAnswerButton(recording) {
+  const b = $('btn-answer');
+  b.innerHTML = recording ? '<ruby>解答<rt>かいとう</rt></ruby><ruby>終了<rt>しゅうりょう</rt></ruby>' : '<ruby>解答<rt>かいとう</rt></ruby>する';
+  b.className = recording ? 'btn-stop' : 'btn-main';
+}
+function updateProgress() {
+  // 学生が話す回数 ＝ 先生が誘う回数 ＋ 最後のあいさつ1回
+  $('progress').innerHTML = Array.from({ length: state.info.invites + 1 }, (_, i) =>
+    `<span class="${i < state.answers ? 'done' : ''}"></span>`).join('');
+}
+
+// GASのサーバーを呼ぶ（text/plain で送ると、CORSの事前確認なしで送れます）
+async function call(action, data, password) {
+  const res = await fetch(SERVER_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action: action, password: password, data: data }),
+  });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const json = await res.json();
+  if (!json.ok) throw new Error(json.error || 'サーバーエラー');
+  return json.result;
+}
+function run(action, data) { return call(action, data, state.info.password); }
+
+function setAudioSession(type) {
+  // iPhone（iOS 17以降）：消音モードでも音が出るようにする
+  try { if (navigator.audioSession) navigator.audioSession.type = type; } catch (e) {}
+}
+function warnLeave(e) { e.preventDefault(); e.returnValue = ''; }
+
+// クラスと名前は、次回のために覚えておく（パスワードは覚えません）
+try {
+  $('class-name').value = localStorage.getItem('kaiwa-class') || '';
+  $('student-name').value = localStorage.getItem('kaiwa-name') || '';
+} catch (e) {}
+
+$('pw-toggle').addEventListener('click', () => {
+  const i = $('password');
+  i.type = i.type === 'password' ? 'text' : 'password';
+});
+$('password').addEventListener('input', () => $('pw-error').classList.add('hidden'));
+
+// ============ 1. 会話を始める ============
+$('btn-start').addEventListener('click', async () => {
+  const inviteSel = $('invite').value;
+  const invitesSel = $('invites').value;
+  const studentName = $('student-name').value.trim();
+  const info = {
+    className: $('class-name').value.trim(),
+    studentName: studentName,
+    callName: studentName.split(/[\s　]+/)[0] || '',
+    password: $('password').value.trim(),
+    level: $('level').value,
+    inviteId: inviteSel === 'random' ? INVITE_IDS[Math.floor(Math.random() * INVITE_IDS.length)] : inviteSel,
+    invites: invitesSel === 'random' ? (Math.random() < 0.5 ? 3 : 4) : Number(invitesSel),
+  };
+  if (!SERVER_URL.startsWith('https://script.google.com/')) {
+    alert('index.html の GAS_URL が正しくありません。\n今の値：' + (SERVER_URL || '（空）')); return;
+  }
+  if (SERVER_URL.endsWith('/dev')) {
+    alert('GAS_URL が「/dev」で終わっています。「デプロイを管理」に出ている「/exec」で終わるURLを使ってください。'); return;
+  }
+  if (!info.className || !info.studentName || !info.password) {
+    alert('クラス、名前、パスワードを全部書いてください。'); return;
+  }
+  if (!/^[゠-ヿ\s　]+$/.test(info.studentName)) {
+    alert('名前は、全角のカタカナで書いてください。'); return;
+  }
+
+  $('btn-start').disabled = true;
+
+  // ボタンを押したときに音を使えるようにする（iPhone対策）
+  const AC = window.AudioContext || window.webkitAudioContext;
+  audioCtx = new AC();
+  audioCtx.resume();
+
+  // パスワードを確かめる
+  try {
+    await call('check', null, info.password);
+  } catch (e) {
+    $('btn-start').disabled = false;
+    if (e.message === 'PASSWORD') {
+      $('pw-error').classList.remove('hidden');
+      $('password').focus();
+    } else {
+      alert('サーバーにつながりませんでした。もう一度押してください。');
+    }
+    return;
+  }
+
+  // マイクの許可を先にもらう
+  try {
+    setAudioSession('play-and-record');
+    const s = await navigator.mediaDevices.getUserMedia({ audio: true });
+    s.getTracks().forEach(t => t.stop());
+    setAudioSession('playback');
+  } catch (e) {
+    alert('マイクが使えません。\n・マイクを「許可」してください。\n・LINEなどのアプリの中ではなく、SafariかChromeで開いてください。');
+    $('btn-start').disabled = false;
+    return;
+  }
+
+  try {
+    localStorage.setItem('kaiwa-class', info.className);
+    localStorage.setItem('kaiwa-name', info.studentName);
+  } catch (e) {}
+
+  state.info = info;
+  state.history = [];
+  state.audios = [];
+  state.answers = 0;
+  state.badCount = 0;
+  state.endReason = '';
+  state.finished = false;
+  state.result = null;
+  state.downloaded = false;
+  aiBuffer = null;
+  $('illust').innerHTML = ILLUST;
+  updateProgress();
+  setAnswerButton(false);
+  showScreen('screen-talk');
+  window.addEventListener('beforeunload', warnLeave);
+  sendTurn(null);
+});
+
+// ============ 2. サーバーに送って、先生（AI）の返事をもらう ============
+async function sendTurn(wav) {
+  state.lastWav = wav;
+  setButtons({});
+  setLoading(true);
+  setStatus(wav ? '少し待ってください…' : '準備しています…');
+
+  let res;
+  try {
+    res = await run('turn', {
+      inviteId: state.info.inviteId, level: state.info.level, invites: state.info.invites,
+      callName: state.info.callName, badCount: state.badCount,
+      history: state.history, audio: wav,
+    });
+  } catch (err) {
+    console.error(err);
+    setLoading(false);
+    setStatus(err.message === 'PASSWORD'
+      ? 'パスワードが変わりました。先生に聞いてください。'
+      : '通信がうまくいきませんでした。「もう一度送る」を押してください。');
+    setButtons({ resend: err.message !== 'PASSWORD' });
+    return;
+  }
+  setLoading(false);
+
+  if (res.retry) {
+    setStatus(res.message);
+    setButtons({ answer: true, repeat: !state.repeatUsed && !!aiBuffer });
+    return;
+  }
+
+  try {
+    aiBuffer = await decodeMp3(res.audio);
+  } catch (e) {
+    console.error(e);
+    setStatus('音声を読み込めませんでした。「もう一度送る」を押してください。');
+    setButtons({ resend: true });
+    return;
+  }
+
+  if (res.transcript) {
+    state.history.push({ role: 'student', text: res.transcript });
+    state.audios.push(state.lastWav); // 答えの声は、発音の評価とダウンロードのためにとっておく
+    state.answers++;
+  }
+  if (res.inappropriate) state.badCount++;
+  state.history.push({ role: 'ai', text: res.reply });
+  state.finished = !!res.finished;
+  state.endReason = res.endReason || '';
+  state.repeatUsed = false;
+  state.lastWav = null;
+  updateProgress();
+  playAi();
+}
+
+$('btn-resend').addEventListener('click', () => sendTurn(state.lastWav));
+
+// ============ 3. 先生の音声を再生する ============
+async function playAi() {
+  setButtons({});
+  setStatus('よく聞いてください。');
+  setAudioSession('playback');
+  try { await audioCtx.resume(); } catch (e) {}
+  if (audioCtx.state !== 'running') {
+    // 自動で音が出ないときは、ボタンを押してもらう
+    setStatus('「聞く」を押してください。');
+    setButtons({ listen: true });
+    return;
+  }
+  await playBuffer(aiBuffer);
+
+  if (state.finished) { finish(); return; }
+  setStatus('あなたの番です。「解答する」を押して、話してください。');
+  setButtons({ answer: true, repeat: !state.repeatUsed });
+}
+
+function playBuffer(buf) {
+  return new Promise(resolve => {
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    src.connect(audioCtx.destination);
+    let done = false;
+    const end = () => { if (!done) { done = true; resolve(); } };
+    src.onended = end;
+    setTimeout(end, (buf.duration + 3) * 1000); // 念のため
+    src.start(0);
+  });
+}
+
+$('btn-listen').addEventListener('click', () => { audioCtx.resume(); playAi(); });
+
+// 「もう一度お願いします」は1回の発話で1回だけ
+$('btn-repeat').addEventListener('click', () => {
+  if (state.repeatUsed || !aiBuffer) return;
+  state.repeatUsed = true;
+  playAi();
+});
+
+// ============ 4. 録音する ============
+$('btn-answer').addEventListener('click', async () => {
+  if (rec) { stopAndSend(); return; }
+  try {
+    await startRec();
+  } catch (e) {
+    console.error(e);
+    alert('録音を始められませんでした。マイクを「許可」してください。');
+    return;
+  }
+  setAnswerButton(true);
+  setButtons({ answer: true });
+  setStatus('録音中です。話し終わったら「解答終了」を押してください。');
+});
+
+async function startRec() {
+  setAudioSession('play-and-record');
+  const stream = await navigator.mediaDevices.getUserMedia({
+    audio: { echoCancellation: true, noiseSuppression: true, channelCount: 1 },
+  });
+  await audioCtx.resume();
+  const source = audioCtx.createMediaStreamSource(stream);
+  const proc = audioCtx.createScriptProcessor(4096, 1, 1);
+  const mute = audioCtx.createGain();
+  mute.gain.value = 0;
+  const chunks = [];
+  proc.onaudioprocess = e => chunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+  source.connect(proc); proc.connect(mute); mute.connect(audioCtx.destination);
+  rec = { stream, source, proc, mute, chunks, start: Date.now() };
+
+  $('rec').classList.remove('hidden');
+  $('rec-time').textContent = '0:00';
+  recTimer = setInterval(() => {
+    const sec = Math.floor((Date.now() - rec.start) / 1000);
+    $('rec-time').textContent = Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+    if (sec >= MAX_REC_SEC) stopAndSend();
+  }, 250);
+}
+
+function stopRec() {
+  clearInterval(recTimer);
+  $('rec').classList.add('hidden');
+  const r = rec;
+  rec = null;
+  try { r.source.disconnect(); r.proc.disconnect(); r.mute.disconnect(); } catch (e) {}
+  r.stream.getTracks().forEach(t => t.stop());
+  setAudioSession('playback');
+  return r.chunks;
+}
+
+function stopAndSend() {
+  if (!rec) return;
+  const chunks = stopRec();
+  setAnswerButton(false);
+  const wav = encodeWav(chunks, audioCtx.sampleRate);
+  if (wav.seconds < 0.8) {
+    setStatus('録音が短すぎました。もう一度「解答する」を押して、話してください。');
+    setButtons({ answer: true, repeat: !state.repeatUsed });
+    return;
+  }
+  sendTurn(wav.base64);
+}
+
+// 録音データ → 16kHz・モノラルのWAV（Base64）
+function encodeWav(chunks, inRate) {
+  const len = chunks.reduce((a, c) => a + c.length, 0);
+  const data = new Float32Array(len);
+  let off = 0;
+  chunks.forEach(c => { data.set(c, off); off += c.length; });
+
+  const outRate = Math.min(16000, inRate);
+  const ratio = inRate / outRate;
+  const outLen = Math.floor(len / ratio);
+  const pcm = new Int16Array(outLen);
+  for (let i = 0; i < outLen; i++) {
+    const s = Math.floor(i * ratio), e = Math.max(s + 1, Math.min(len, Math.floor((i + 1) * ratio)));
+    let sum = 0;
+    for (let j = s; j < e; j++) sum += data[j];
+    let v = Math.max(-1, Math.min(1, sum / (e - s)));
+    pcm[i] = v < 0 ? v * 0x8000 : v * 0x7FFF;
+  }
+
+  const buf = new ArrayBuffer(44 + pcm.length * 2);
+  const dv = new DataView(buf);
+  const str = (o, s) => { for (let i = 0; i < s.length; i++) dv.setUint8(o + i, s.charCodeAt(i)); };
+  str(0, 'RIFF'); dv.setUint32(4, 36 + pcm.length * 2, true); str(8, 'WAVE');
+  str(12, 'fmt '); dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true);
+  dv.setUint32(24, outRate, true); dv.setUint32(28, outRate * 2, true); dv.setUint16(32, 2, true); dv.setUint16(34, 16, true);
+  str(36, 'data'); dv.setUint32(40, pcm.length * 2, true);
+  new Int16Array(buf, 44).set(pcm);
+
+  const bytes = new Uint8Array(buf);
+  let bin = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return { base64: btoa(bin), seconds: outLen / outRate };
+}
+
+function base64ToBytes(b64) {
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+
+function decodeMp3(b64) {
+  const bytes = base64ToBytes(b64);
+  return new Promise((ok, ng) => {
+    const p = audioCtx.decodeAudioData(bytes.buffer, ok, ng);
+    if (p && p.catch) p.catch(ng);
+  });
+}
+
+// ============ 5. 終わり：結果を作って、ダウンロードできるようにする ============
+function finish() {
+  showScreen('screen-finish');
+  const data = {
+    className: state.info.className, studentName: state.info.studentName,
+    level: state.info.level, inviteId: state.info.inviteId, history: state.history,
+    audios: state.audios,
+    endReason: state.endReason,
+  };
+  run('finish', data)
+    .then(r => {
+      state.result = r;
+      $('done-title').textContent = 'お疲れ様でした';
+      $('done-msg').innerHTML = '<ruby>結果<rt>けっか</rt></ruby>ができました。<br>ダウンロードしてから、<ruby>画面<rt>がめん</rt></ruby>を<ruby>閉<rt>と</rt></ruby>じてください。';
+      $('download-area').classList.remove('hidden');
+      $('btn-dl-both').classList.toggle('hidden', !state.audios.length);
+      $('btn-audio-again').classList.add('hidden');
+      $('btn-retry-finish').classList.add('hidden');
+      showScreen('screen-done');
+    })
+    .catch(e => {
+      console.error(e);
+      $('done-title').textContent = '結果を作れませんでした';
+      $('done-msg').textContent = '「もう一度送る」を押してください。だめなときは、先生に言ってください。';
+      $('download-area').classList.add('hidden');
+      $('btn-retry-finish').classList.remove('hidden');
+      showScreen('screen-done');
+    });
+}
+$('btn-retry-finish').addEventListener('click', finish);
+
+function saveBlob(blob, name) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+
+// 自分の答えの声を、1つのWAVファイルにまとめる（答えと答えの間に1秒の無音を入れる）
+function joinWavs(list) {
+  const pcms = list.map(b64 => base64ToBytes(b64).subarray(44));
+  const rate = new DataView(base64ToBytes(list[0]).buffer).getUint32(24, true);
+  const gap = rate * 2; // 1秒分の無音（16bit＝2バイト）
+  const dataLen = pcms.reduce((n, p) => n + p.length, 0) + gap * (pcms.length - 1);
+  const out = new Uint8Array(44 + dataLen);
+  out.set(base64ToBytes(list[0]).subarray(0, 44), 0);
+  const dv = new DataView(out.buffer);
+  dv.setUint32(4, 36 + dataLen, true);
+  dv.setUint32(40, dataLen, true);
+  let off = 44;
+  pcms.forEach((p, i) => { out.set(p, off); off += p.length + (i < pcms.length - 1 ? gap : 0); });
+  return new Blob([out], { type: 'audio/wav' });
+}
+
+function downloadPdf() {
+  saveBlob(new Blob([base64ToBytes(state.result.pdfBase64)], { type: 'application/pdf' }), state.result.fileName + '.pdf');
+  state.downloaded = true;
+  window.removeEventListener('beforeunload', warnLeave);
+}
+function downloadAudio() {
+  saveBlob(joinWavs(state.audios), state.result.fileName + '_音声.wav');
+}
+
+// 結果（成績のみ）
+$('btn-dl-pdf').addEventListener('click', () => {
+  if (!state.result) return;
+  downloadPdf();
+});
+
+// 結果（成績＋音声）：PDFのあと、少し間をあけて音声をダウンロードする
+$('btn-dl-both').addEventListener('click', () => {
+  if (!state.result || !state.audios.length) return;
+  downloadPdf();
+  setTimeout(() => {
+    downloadAudio();
+    // スマホによっては2つ目のダウンロードが止められるので、もう一度押せるボタンを出す
+    $('btn-audio-again').classList.remove('hidden');
+  }, 1500);
+});
+
+$('btn-audio-again').addEventListener('click', () => {
+  if (state.result && state.audios.length) downloadAudio();
+});
+
+$('btn-again').addEventListener('click', () => {
+  if (state.result && !state.downloaded &&
+      !confirm('まだ結果をダウンロードしていません。もう一度練習しますか？')) return;
+  window.removeEventListener('beforeunload', warnLeave);
+  $('btn-start').disabled = false;
+  $('password').value = state.info ? state.info.password : '';
+  showScreen('screen-setup');
+});
+</script>
+</body>
+</html>
